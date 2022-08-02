@@ -1,7 +1,7 @@
-const apiUrl = "https://pokeapi.co/api/v2/pokemon/?"; //API base URL
+const apiUrl = "https://pokeapi.co/api/v2/pokemon/"; //API base URL
 const offset = 0;
 const limit = 665; //limiting Pokemons - sprites are not numbered properly after 665
-const pokemonUrl = apiUrl + "limit=" + limit + "&offset=" + offset; //complete URL with limit
+const pokemonUrl = apiUrl + "?limit=" + limit + "&offset=" + offset; //complete URL with limit
 const spriteUrl =
   "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"; //base URL from which sprites are fetched
 
@@ -16,8 +16,12 @@ var pokemonData; //variable which holds the response from Pokemon API
 var pokemonSet = [];
 
 //function that fetched Pokemon data from the API
-const fetchPokemonData = async (url) => {
-  return fetch(url).then((response) => response.json());
+const fetchPokemonData = async () => {
+  return fetch(pokemonUrl).then((response) => response.json());
+};
+
+const fetchPokemonDetails = async (pokemonName) => {
+  return fetch(apiUrl + pokemonName).then((response) => response.json());
 };
 
 //main function
@@ -32,17 +36,28 @@ const checkGuess = (button) => {
   if (parseInt(button.getAttribute("data-id")) === correctAnswer) {
     streak++; //correct guess - increase streak by one
     streakElement.classList.add("hit");
-    setTimeout(() => streakElement.classList.remove("hit"), 1500); // wait two seconds before generating new Pokemon and start the same logic again
+    button.classList.add("hit");
+    setTimeout(() => {
+      button.classList.remove("hit");
+      streakElement.classList.remove("hit");
+    }, 1500); // wait two seconds before generating new Pokemon and start the same logic again
   } else {
     streak = 0; //wrong guess - reset streak
+    let correctButton = document.querySelectorAll(
+      '[data-id="' + correctAnswer + '"]'
+    );
+    correctButton[0].classList.add("miss");
     streakElement.classList.add("miss");
-    setTimeout(() => streakElement.classList.remove("miss"), 1500); // wait two seconds before generating new Pokemon and start the same logic again
+    setTimeout(() => {
+      correctButton[0].classList.remove("miss");
+      streakElement.classList.remove("miss");
+    }, 1500); // wait two seconds before generating new Pokemon and start the same logic again
   }
   showPokemon(); //call function that will reveal a Pokemon
 };
 
 //function that generates random number, shows a Pokemon's shadow with that number and saves Pokemon name to variable
-function getPokemon() {
+const getPokemon = async () => {
   // Initialization
   for (i = 0; i < MAX_NUMBER_OF_GUESSES; i++) {
     pokemonSet[i] = getRandomIntInclusive(offset, limit + offset); //get a random number
@@ -69,14 +84,22 @@ function getPokemon() {
 
   correctAnswer = Math.floor(Math.random() * MAX_NUMBER_OF_GUESSES);
 
+  spriteElement.src = "loading.gif";
+
+  let pokemonDetails = await fetchPokemonDetails(
+    pokemonData[pokemonSet[correctAnswer]].name
+  );
+
   spriteElement.style.setProperty("transition", "initial"); //reset CSS transition property
   spriteElement.src = ""; //reset sprite URL so it has smooth transition to new Pokemon sprite
   spriteElement.style.setProperty("filter", "brightness(0)"); //set CSS property brightness to zero of sprite element - that way shadow is created
-  let sprite = spriteUrl + pokemonSet[correctAnswer].toString() + ".png"; //create URL to Pokemon's sprite.
+
+  let sprite = pokemonDetails.sprites.other["official-artwork"].front_default;
+  if (sprite == null) sprite = pokemonDetails.sprites.front_default;
   spriteElement.src = sprite; //set URL to src property of img tag
 
   console.log(pokemonData[pokemonSet[correctAnswer]].name);
-}
+};
 
 //function that reveals Pokemon's sprite, shows Pokemon's name and calls getPokeon function
 function showPokemon() {
