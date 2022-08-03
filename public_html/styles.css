@@ -78,12 +78,12 @@ body {
 
 #streak.hit {
     transition: none;
-    color: rgb(21, 255, 0);
+    color: var(--colorHit);
 }
 
 #streak.miss {
     transition: none;
-    color: rgb(31, 31, 31);
+    color: var(--colorMiss);
 }
 
 button {
