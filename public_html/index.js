@@ -10,6 +10,9 @@ const MAX_NUMBER_OF_GUESSES = 3;
 const spriteElement = document.getElementById("sprite"); //element object from HTML with an id 'sprite'
 const streakElement = document.getElementById("streak"); //element object from HTML with an id 'streak'
 
+var audioHit = new Audio("hit.wav");
+var audioMiss = new Audio("miss.wav");
+
 var correctAnswer = -1;
 var streak = 0; //initialize streak to zero
 var pokemonData; //variable which holds the response from Pokemon API
@@ -37,6 +40,7 @@ const checkGuess = (button) => {
     streak++; //correct guess - increase streak by one
     streakElement.classList.add("hit");
     button.classList.add("hit");
+    audioHit.play();
     setTimeout(() => {
       button.classList.remove("hit");
       streakElement.classList.remove("hit");
@@ -48,6 +52,7 @@ const checkGuess = (button) => {
     );
     correctButton[0].classList.add("miss");
     streakElement.classList.add("miss");
+    audioMiss.play();
     setTimeout(() => {
       correctButton[0].classList.remove("miss");
       streakElement.classList.remove("miss");

@@ -30,6 +30,7 @@ body {
 .main-container {
     display: flex;
     flex-flow: column;
+    height: 100%;
     width: 100%;
     text-align: center;
     align-items: center;
@@ -88,6 +89,7 @@ body {
 button {
     position: relative;
     display: inline-block;
+    margin: 3px;
     outline: none;
     border: 0;
     vertical-align: middle;
@@ -96,7 +98,7 @@ button {
     text-transform: capitalize;
     font-family: pokemon-one;
     color: #d8821f;
-    -webkit-text-stroke: 2px #584e4e;
+    -webkit-text-stroke: 1px #584e4e;
 }
   
 button.big-button {
@@ -109,15 +111,13 @@ button.big-button {
 }
 
 button.big-button.hit {
+    color: var(--colorHit);
     border: 7px solid var(--colorHit);
 }
 
 button.big-button.miss {
+    color: var(--colorMiss);
     border: 7px solid var(--colorMiss);
-}
-
-button.big-button.miss {
-    border: 5px solid var(--colorMiss);
 }
 
 button.big-button::before {
