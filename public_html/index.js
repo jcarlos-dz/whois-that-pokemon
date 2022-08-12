@@ -1,4 +1,5 @@
 const apiUrl = "https://pokeapi.co/api/v2/pokemon/"; //API base URL
+const delay = 1500;
 const offset = 0;
 const limit = 665; //limiting Pokemons - sprites are not numbered properly after 665
 const pokemonUrl = apiUrl + "?limit=" + limit + "&offset=" + offset; //complete URL with limit
@@ -17,6 +18,7 @@ var correctAnswer = -1;
 var streak = 0; //initialize streak to zero
 var pokemonData; //variable which holds the response from Pokemon API
 var pokemonSet = [];
+var buttonsBlocked = false;
 
 //function that fetched Pokemon data from the API
 const fetchPokemonData = async () => {
@@ -34,30 +36,46 @@ const main = async () => {
   getPokemon();
 };
 
+const displayInteraction = (whichAudio, whichButton, whichClass) => {
+  whichAudio.play();
+  streakElement.classList.add(whichClass);
+  whichButton.classList.add(whichClass);
+
+  setTimeout(() => {
+    whichButton.classList.remove(whichClass);
+    streakElement.classList.remove(whichClass);
+    resolve();
+  }, delay); // wait before generating new Pokemon and start the same logic again
+};
+
 //function that compares player's guess with Pokemon name and based on that either increases or resets streak
-const checkGuess = (button) => {
+const checkGuess = async (button) => {
+  if (buttonsBlocked) {
+    // So that player cannot press the button again while showing correct answer
+    return;
+  }
+
+  buttonsBlocked = true;
+  let theClass = "";
+  let theButton = "";
+  let theAudio = "";
+
   if (parseInt(button.getAttribute("data-id")) === correctAnswer) {
     streak++; //correct guess - increase streak by one
-    streakElement.classList.add("hit");
-    button.classList.add("hit");
-    audioHit.play();
-    setTimeout(() => {
-      button.classList.remove("hit");
-      streakElement.classList.remove("hit");
-    }, 1500); // wait two seconds before generating new Pokemon and start the same logic again
+    theAudio = audioHit;
+    theButton = button;
+    theClass = "hit";
   } else {
     streak = 0; //wrong guess - reset streak
     let correctButton = document.querySelectorAll(
       '[data-id="' + correctAnswer + '"]'
     );
-    correctButton[0].classList.add("miss");
-    streakElement.classList.add("miss");
-    audioMiss.play();
-    setTimeout(() => {
-      correctButton[0].classList.remove("miss");
-      streakElement.classList.remove("miss");
-    }, 1500); // wait two seconds before generating new Pokemon and start the same logic again
+    theAudio = audioMiss;
+    theButton = correctButton[0];
+    theClass = "miss";
   }
+  displayInteraction(theAudio, theButton, theClass);
+
   showPokemon(); //call function that will reveal a Pokemon
 };
 
@@ -67,21 +85,6 @@ const getPokemon = async () => {
   for (i = 0; i < MAX_NUMBER_OF_GUESSES; i++) {
     pokemonSet[i] = getRandomIntInclusive(offset, limit + offset); //get a random number
   }
-
-  /*
-  let repeated;
-  do {
-    repeted = false;
-    for (i = 0; i < MAX_NUMBER_OF_GUESSES; i++) {
-      for (j = i + 1; j < MAX_NUMBER_OF_GUESSES; j++) {
-        if (pokemonSet[i] === pokemonSet[j]) {
-          pokemonSet[j] = getRandomIntInclusive(offset, limit + offset);
-          repeated = true;
-        }
-      }
-    }
-  } while (repeated);
-  */
 
   guess1.innerHTML = pokemonData[pokemonSet[0]].name;
   guess2.innerHTML = pokemonData[pokemonSet[1]].name;
@@ -104,6 +107,7 @@ const getPokemon = async () => {
   spriteElement.src = sprite; //set URL to src property of img tag
 
   console.log(pokemonData[pokemonSet[correctAnswer]].name);
+  buttonsBlocked = false;
 };
 
 //function that reveals Pokemon's sprite, shows Pokemon's name and calls getPokeon function
@@ -112,7 +116,7 @@ function showPokemon() {
   spriteElement.style.setProperty("transition", "filter 1s ease-out"); // add CSS property to reveal Pokemon with simple transition from shadow to normal brightness
   spriteElement.style.setProperty("filter", "initial");
 
-  setTimeout(() => getPokemon(), 2000); // wait two seconds before generating new Pokemon and start the same logic again
+  setTimeout(() => getPokemon(), delay); // wait before generating new Pokemon and start the same logic again
 }
 
 //function that generates random number between min value and max value.
