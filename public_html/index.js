@@ -44,7 +44,6 @@ const displayInteraction = (whichAudio, whichButton, whichClass) => {
   setTimeout(() => {
     whichButton.classList.remove(whichClass);
     streakElement.classList.remove(whichClass);
-    resolve();
   }, delay); // wait before generating new Pokemon and start the same logic again
 };
 
