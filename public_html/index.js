@@ -13,6 +13,7 @@ const streakElement = document.getElementById("streak"); //element object from H
 
 var audioHit = new Audio("hit.wav");
 var audioMiss = new Audio("miss.wav");
+var countdown = 10;
 
 var correctAnswer = -1;
 var streak = 0; //initialize streak to zero
@@ -34,6 +35,7 @@ const main = async () => {
   let response = await fetchPokemonData(pokemonUrl);
   pokemonData = response.results; //save API response to pokemonData variable
   getPokemon();
+  startCountdown();
 };
 
 const displayInteraction = (whichAudio, whichButton, whichClass) => {
@@ -48,7 +50,7 @@ const displayInteraction = (whichAudio, whichButton, whichClass) => {
 };
 
 //function that compares player's guess with Pokemon name and based on that either increases or resets streak
-const checkGuess = async (button) => {
+const checkGuess = async (button = null) => {
   if (buttonsBlocked) {
     // So that player cannot press the button again while showing correct answer
     return;
@@ -59,7 +61,10 @@ const checkGuess = async (button) => {
   let theButton = "";
   let theAudio = "";
 
-  if (parseInt(button.getAttribute("data-id")) === correctAnswer) {
+  if (
+    button != null &&
+    parseInt(button.getAttribute("data-id")) === correctAnswer
+  ) {
     streak++; //correct guess - increase streak by one
     theAudio = audioHit;
     theButton = button;
@@ -107,23 +112,38 @@ const getPokemon = async () => {
 
   console.log(pokemonData[pokemonSet[correctAnswer]].name);
   buttonsBlocked = false;
+
+  countdown = 10;
+  document.getElementById("progress").classList.remove("progress");
+  void document.getElementById("progress").offsetWidth;
+  document.getElementById("progress").classList.add("progress");
 };
 
 //function that reveals Pokemon's sprite, shows Pokemon's name and calls getPokeon function
-function showPokemon() {
+const showPokemon = () => {
   streakElement.innerHTML = "Streak: " + streak; // show new streak value
   spriteElement.style.setProperty("transition", "filter 1s ease-out"); // add CSS property to reveal Pokemon with simple transition from shadow to normal brightness
   spriteElement.style.setProperty("filter", "initial");
 
   setTimeout(() => getPokemon(), delay); // wait before generating new Pokemon and start the same logic again
-}
+};
 
 //function that generates random number between min value and max value.
-function getRandomIntInclusive(min, max) {
+const getRandomIntInclusive = (min, max) => {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
-}
+};
+
+const startCountdown = () => {
+  setInterval(() => {
+    countdown--;
+    if (countdown <= 0) {
+      countdown = 0;
+      checkGuess();
+    }
+  }, 1000);
+};
 
 //function call that starts application
 main();

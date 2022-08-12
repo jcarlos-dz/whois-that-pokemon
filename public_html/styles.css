@@ -7,6 +7,7 @@
     --colorHit: rgb(126, 242, 59);
     --colorMiss: rgb(0, 0, 0);
     --colorButtonText: rgb(164, 0, 0);
+    --pokemonBlue: #375da9;
   }
 
 * {
@@ -40,6 +41,10 @@ body {
     flex: 1;
 }
 
+.options-container {
+    padding: 10px;
+}
+
 .streak-container {
     padding-top: 10px;
 }
@@ -57,7 +62,7 @@ body {
 #title {
     font-family: pokemon-one;
     color: #ffcc00;
-    -webkit-text-stroke: 3px #375da9;
+    -webkit-text-stroke: 3px var(--pokemonBlue);
     font-size: 7vh;
 }
   
@@ -71,7 +76,7 @@ body {
 #streak {
     font-size: 5vh;
     font-family: pokemon-one;
-    color: #375da9;
+    color: var(--pokemonBlue);
     -webkit-text-stroke: 3px #ffcc00;
     transition: all 1s ease-out;
 }
@@ -97,7 +102,7 @@ button {
     text-transform: capitalize;
     font-family: pokemon-one;
     color: #ffcc00;
-    -webkit-text-stroke: 2px #375da9;
+    -webkit-text-stroke: 2px var(--pokemonBlue);
 }
   
 button.big-button {
@@ -142,4 +147,44 @@ button.big-button:active {
 button.big-button:active::before {
     transform: translate3d(0, 0, -1em);
     box-shadow: 0 0 0 2px var(--colorShadeB), 0 0.25em 0 0 var(--colorShadeB);
+}
+
+.progress-bar {
+    background-color: lightgrey;
+    width: 200px;
+    height: 20px;
+    border-radius: 10px;
+}
+  
+.progress {
+    width: 100%;
+    height: 100%;
+    background-color: var(--pokemonBlue);
+    animation: color 10s linear 0s alternate;
+}
+
+.progress-stopped {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    animation: none;
+}
+  
+@keyframes color{
+    25% {
+      background-color: #0f0;
+      width: 75%;
+    }
+    50% {
+      background-color: #ff0;
+      width: 50%;
+    }
+    75% {
+      background-color: #f00;
+      width: 25%;
+    }
+      100% {
+      background-color: #000;
+      width: 0%;
+    }
 }
