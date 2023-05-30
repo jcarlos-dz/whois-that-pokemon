@@ -42,11 +42,6 @@ const displayInteraction = (whichAudio, whichButton, whichClass) => {
   whichAudio.play();
   streakElement.classList.add(whichClass);
   whichButton.classList.add(whichClass);
-
-  setTimeout(() => {
-    whichButton.classList.remove(whichClass);
-    streakElement.classList.remove(whichClass);
-  }, delay); // wait before generating new Pokemon and start the same logic again
 };
 
 //function that compares player's guess with Pokemon name and based on that either increases or resets streak
@@ -70,17 +65,28 @@ const checkGuess = async (button = null) => {
     theButton = button;
     theClass = "hit";
   } else {
-    streak = 0; //wrong guess - reset streak
     let correctButton = document.querySelectorAll(
       '[data-id="' + correctAnswer + '"]'
     );
     theAudio = audioMiss;
     theButton = correctButton[0];
     theClass = "miss";
+    document.getElementById("progress-bar").hidden = true;
   }
   displayInteraction(theAudio, theButton, theClass);
 
-  showPokemon(); //call function that will reveal a Pokemon
+  streakElement.innerHTML = "Streak: " + streak; // show new streak value
+  spriteElement.style.setProperty("transition", "filter 1s ease-out"); // add CSS property to reveal Pokemon with simple transition from shadow to normal brightness
+  spriteElement.style.setProperty("filter", "initial");
+
+  if (theClass == "hit") {
+    setTimeout(() => {
+      theButton.classList.remove(theClass);
+      streakElement.classList.remove(theClass);
+    }, delay); // wait before generating new Pokemon and start the same logic again
+
+    setTimeout(() => getPokemon(), delay); // wait before generating new Pokemon and start the same logic again
+  }
 };
 
 //function that generates random number, shows a Pokemon's shadow with that number and saves Pokemon name to variable
@@ -117,15 +123,6 @@ const getPokemon = async () => {
   document.getElementById("progress").classList.remove("progress");
   void document.getElementById("progress").offsetWidth;
   document.getElementById("progress").classList.add("progress");
-};
-
-//function that reveals Pokemon's sprite, shows Pokemon's name and calls getPokeon function
-const showPokemon = () => {
-  streakElement.innerHTML = "Streak: " + streak; // show new streak value
-  spriteElement.style.setProperty("transition", "filter 1s ease-out"); // add CSS property to reveal Pokemon with simple transition from shadow to normal brightness
-  spriteElement.style.setProperty("filter", "initial");
-
-  setTimeout(() => getPokemon(), delay); // wait before generating new Pokemon and start the same logic again
 };
 
 //function that generates random number between min value and max value.
